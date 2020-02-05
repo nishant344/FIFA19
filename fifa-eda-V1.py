@@ -1,6 +1,9 @@
 from zipfile import ZipFile
 import os
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt # matplotlib for plotting
+import seaborn as sns # seaborn for better graphics
 
 # Check if csv file is already extracted from zip file in data folder, if not extracted, extract zip file        
 if any(os.path.splitext(f)[1] == '.csv' for f in os.listdir('./data')) == False:
@@ -88,8 +91,23 @@ for i in range(len(df)):
 # Now, for the 'Release Clause' column, lets set their value as the mean of the values of that player's rating.
 # For this, first we need to convert the data in this column to a numeric value.
 # We will remove '€' symbol and tackle 'M' and "K' string with correct multiplication factors.
-df['Release Clause']=df['Release Clause'].replace('[\€]', '', regex=True)
+# So lets create a function for currency conversion.
+def currency_converter(val):
+    amount = val.replace('€','')
+    if 'K' in amount:
+        factor=pow(10,3)
+        amount = float(amount.replace('K', ''))*factor
+    elif 'M' in amount:
+        factor=pow(10,6)
+        amount = float(amount.replace('M', ''))*factor
+    return float(amount)
 
+# We will apply this function to Value, Wage and columns
+df.Value =  df.Value.apply(lambda x: currency_converter(x))
+df.Wage =  df.Wage.apply(lambda x: currency_converter(x))
+#df['Release Clause'] =  df['Release Clause'].apply(lambda x: currency_converter(x))
+
+df['Release Clause']=df['Release Clause'].replace('[\€]', '', regex=True)
 for i in range(len(df['Release Clause'])):
     if pd.isnull(df['Release Clause'].iloc[i])==False:
         release_val=df['Release Clause'][i][:-1]
@@ -101,5 +119,30 @@ for i in range(len(df['Release Clause'])):
         df['Release Clause'][i]=pd.to_numeric(release_val)*factor
     else: continue
     
-df['Release Clause'].astype(float)
-df[['Release Clause','Overall']].groupby(['Overall']).max()
+df['Release Clause']=df['Release Clause'].astype(float)
+df_RC_Overall=df[['Release Clause','Overall']]
+df_RC_Overall_null=df_RC_Overall[df['Release Clause'].isnull()]
+df_RC_Overall_notnull=df_RC_Overall.dropna(subset=['Release Clause'])
+df_RC_Overall_notnull=df_RC_Overall_notnull.reset_index(drop=True)
+df_means=df_RC_Overall_notnull.groupby(['Overall']).mean()
+df_means=df_means.reset_index()
+
+for i in range(len(df)):
+    if pd.isnull(df['Release Clause'].iloc[i])==True:
+        rating=df.Overall[i]
+        df['Release Clause'][i]=df_means['Release Clause'][df_means.Overall==rating]
+    else: continue
+
+# Checking null values again, we see almost all the data is cleaned now
+df_null_count=df.isna().sum()
+df_null_count=df_null_count[df_null_count>0]
+# There are 26 columns having 1992 missing values ('nan'). This is exactly the same number of goalkeepers in the dataset.
+len(df_GK)
+# The reason they are null is because Goalkeepers wont have these positional attributes of other players. Hence, they should logically be nan.
+# While comparing the positional attributes, we should make sure, we dont compare other players with Goalkeeprs.
+# Same goes by comparing attributes of Goalkeeper with other players.
+
+# Now lets set the datatypes of columns correctly.
+df.info()
+
+# We have now logically cleaned our data. Time for analysis.
