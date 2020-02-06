@@ -145,4 +145,75 @@ len(df_GK)
 # Now lets set the datatypes of columns correctly.
 df.info()
 
-# We have now logically cleaned our data. Time for analysis.
+# We have now logically cleaned our data. Lets see the data is not having abnormal entries.
+df.nunique()
+# The data shows players are from 163 different countries, 651 Clubs.
+df.Age.describe() # Min age is 16 and eldest player is of age 45.
+sns.countplot(df.Age)
+
+# Define functions for different types of plots to use in future as and when needed.
+'''Function to distribution plot'''
+def distplot(feature, col):
+    global ax
+    font_size = 16
+    title_size = 20
+    plt.rcParams['figure.figsize'] = (12, 4)
+    ax = sns.distplot(feature, color = col)
+    plt.xlabel('%s' %feature.name, fontsize = font_size)
+    plt.ylabel('Count of the Players', fontsize = font_size)
+    plt.xticks(fontsize = font_size)
+    plt.yticks(fontsize = font_size)
+    plt.title('%s' %feature.name + ' Distribution of Players', fontsize = title_size)
+    plt.show()
+
+'''Function to count plot'''
+def countplot(feature, title, color):
+    global ax
+    font_size = 14
+    title_size = 20
+    plt.rcParams['figure.figsize'] = (12, 6)
+    ax = sns.countplot(feature, palette = color)
+    plt.xlabel('%s' %feature.name, fontsize = font_size)
+    plt.ylabel('Count of the Players', fontsize = font_size)
+    plt.xticks(fontsize = font_size)
+    plt.yticks(fontsize = font_size)
+    plt.title(title, fontsize = title_size)
+    plt.show()
+    
+'''Function to pie chart''' 
+def piechart(variable, title, color):
+    labels = ['1', '2', '3', '4', '5']
+    variable = variable.value_counts()
+    explode = [0.1, 0.1, 0.2, 0.5, 0.9]
+    plt.rcParams['figure.figsize'] = (9, 9)
+    plt.pie(variable, labels = labels, colors = color, explode = explode, shadow = True)
+    plt.title(title, fontsize = 20)
+    plt.legend()
+    plt.show()
+
+countplot(df.Age,'Distribution of Players across Age groups','coolwarm')
+distplot(df.Age,'g')
+# We see age is as expected clustered around mid 20s and is right skewed.
+# There is no outlier and abnormal value in Age column.
+
+# Lets visualise the nationality data
+df.Nationality.value_counts()
+# This shows most of the players are from England. Lets visualise top 10 countries.
+sns.barplot(x='index',y='Nationality',data=df.Nationality.value_counts()[:10].reset_index())
+plt.xlabel('Nationality')
+plt.ylabel('Count of the players')
+plt.title('Players distribution among top 10 countries')
+
+df_describe=df.describe() # analysing data across various columns by storing in dataframe
+# Analysing this we see Potential and Overall are also having no abnormal data
+
+# Analysing clubs
+df.Club.value_counts()
+# There are 651 clubs with number of players ranging from 33 to 19. So, data seems to be reasonable.
+
+# Lets have a look at player's value
+# df_describe shows min value is 0. Lets find out more.
+df_val_0=df[df.Value==0]
+# There are 11 such players, with age range of 39 to 44 with mostly 40 as the age of collection.
+# Exact reason couldn't be found out just with the current data and some background check needs to be done.
+# Let's not worry about these 11 player's Value now.
