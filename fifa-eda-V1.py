@@ -157,7 +157,7 @@ def distplot(feature, col):
     global ax
     font_size = 16
     title_size = 20
-    plt.rcParams['figure.figsize'] = (12, 4)
+    plt.rcParams['figure.figsize'] = (12, 5)
     ax = sns.distplot(feature, color = col)
     plt.xlabel('%s' %feature.name, fontsize = font_size)
     plt.ylabel('Count of the Players', fontsize = font_size)
@@ -171,7 +171,7 @@ def countplot(feature, title, color):
     global ax
     font_size = 14
     title_size = 20
-    plt.rcParams['figure.figsize'] = (12, 6)
+    plt.rcParams['figure.figsize'] = (12, 5)
     ax = sns.countplot(feature, palette = color)
     plt.xlabel('%s' %feature.name, fontsize = font_size)
     plt.ylabel('Count of the Players', fontsize = font_size)
@@ -179,20 +179,11 @@ def countplot(feature, title, color):
     plt.yticks(fontsize = font_size)
     plt.title(title, fontsize = title_size)
     plt.show()
-    
-'''Function to pie chart''' 
-def piechart(variable, title, color):
-    labels = ['1', '2', '3', '4', '5']
-    variable = variable.value_counts()
-    explode = [0.1, 0.1, 0.2, 0.5, 0.9]
-    plt.rcParams['figure.figsize'] = (9, 9)
-    plt.pie(variable, labels = labels, colors = color, explode = explode, shadow = True)
-    plt.title(title, fontsize = 20)
-    plt.legend()
-    plt.show()
 
 countplot(df.Age,'Distribution of Players across Age groups','coolwarm')
 distplot(df.Age,'g')
+sns.set_style('whitegrid')
+sns.boxplot(data=df.Age)
 # We see age is as expected clustered around mid 20s and is right skewed.
 # There is no outlier and abnormal value in Age column.
 
@@ -217,3 +208,60 @@ df_val_0=df[df.Value==0]
 # There are 11 such players, with age range of 39 to 44 with mostly 40 as the age of collection.
 # Exact reason couldn't be found out just with the current data and some background check needs to be done.
 # Let's not worry about these 11 player's Value now.
+# Let's visualise Value distribution of players
+distplot(df.Value,'g')
+# We see the distribution being highly right skewed which is expected as only few players are valued very high.
+# This can be seen from the means and other statistic paramters in df_describe for Value. Same goes for wage.
+# The mean value is 2.44863 M dollars.
+df[['Name','Value','Wage','Potential','Age','Nationality']][df.Value==max(df.Value)]
+# We can see that Neymar Jr. has the highest value.
+# Let's find out the top 5 valued players
+df[['Name','Value','Wage','Potential','Age','Nationality']].sort_values(by=['Value'],ascending=False).head(5)
+# Interesting, no Christiano Ronaldo in the list of top 5. But, all class players in the list.
+
+# Lets do similar analysis for Wage of Players.
+distplot(df.Wage,'g')
+df[['Name','Value','Wage','Potential','Age','Nationality']].sort_values(by=['Wage'],ascending=False).head(5)
+# We can see some shuffling in the lsit now with Messi having the highest wage.
+
+# Let's analyse Special attribute of players
+distplot(df.Special,'g')
+sns.boxplot(data=df.Special)
+# From the plots, we see this paramter is not having much otliers and values are distributed close to normal distribution (A bit left skewed).
+# Lets find which top 10 players are most special
+df[['Name','Special','Overall','Nationality']].sort_values(by=['Special'],ascending=False).head(10)
+# Suarez, De Bruyne, Modric have high special attribute.
+
+# Time to analyse the preferred foot of players.
+sns.countplot(df['Preferred Foot'])
+plt.title('Most Preferred Foot of the Players', fontsize = 14)
+# Clearly, there are more number of Right footed players
+
+# Analyzing International Reputation
+df['International Reputation'].value_counts()
+# Many players have reputaion of 1 and only 6 players are rated 5. Let's have a look at them.
+df[['Name','Value','International Reputation','Overall','Age','Nationality']][df['International Reputation']==5]
+# Greats of the game who are well known are the world are listed. Also, Ibrahimović makes the cut.
+
+# Analyzing Weak Foot
+sns.countplot(df['Weak Foot'])
+# This is normally distributed. Majority players dont have higher ratings of their weak foot.
+df['Weak Foot'].value_counts() # Also, players having very less skill with their weak foot is also rare.
+
+# Analyzing Skill Moves
+sns.countplot(df['Skill Moves'])
+# Majority of players have rating of 2 and 3 for their skills.
+df['Skill Moves'].value_counts() # There are 50 players with skill moves of 5. Lets see top 10 sorted by their overall rating.
+df[['Name','Skill Moves','Overall','Potential','Nationality','Age']][df['Skill Moves']==5].sort_values(by=['Overall'],ascending=False).head(10)
+# Interstingly Messi doesn't appear to be in the list. Need to ask FIFA to update his skill rating, lol.
+# K. Mbappé is highly rated for skill moves and is only 19. Quite a potential. His potential rating is highest in the list.
+
+# Analyzing Work Rate
+sns.countplot(df['Work Rate'])
+# We can see maximum number of players have medium attack/defense work rate.
+df['Work Rate'].value_counts()
+# Only 34 players are have low work rate in both.
+df[['Name','Work Rate','Overall','Club','Age']][df['Work Rate']=='Low/ Low'].sort_values(by=['Overall'],ascending=True).head(10)
+# Obviously, these players are rated low and would have to work harder to get good contracts.
+sns.violinplot(x='Work Rate', y='Special', data=df)
+# We can see that players with high work rate in either attack, defense or both are rated more special.
