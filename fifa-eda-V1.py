@@ -265,3 +265,71 @@ df[['Name','Work Rate','Overall','Club','Age']][df['Work Rate']=='Low/ Low'].sor
 # Obviously, these players are rated low and would have to work harder to get good contracts.
 sns.violinplot(x='Work Rate', y='Special', data=df)
 # We can see that players with high work rate in either attack, defense or both are rated more special.
+
+# Analyzing Body Type
+df['Body Type'].value_counts()
+# We can see there are three major categories of Body types - Normal, Lean, Stocky.
+# Other body types are named mostly as player names. We need to update that.
+body_type=['Normal','Lean','Stocky']
+for i in range(len(df)):
+    if df['Body Type'][i] not in body_type:
+        df['Body Type'][i]='Lean'
+    else: continue
+
+countplot(df['Body Type'],"Distribution of Player's body type",'coolwarm')
+# We see majority of players have Normal body type and few have stocky body type
+
+# Analyzing Position
+df.Position.value_counts()
+len(df.Position.unique())
+plt.rcParams['figure.figsize'] = (18, 10)
+sns.countplot(df.Position, palette='bone')
+# Data seems to be clean for this column.
+
+# Analysing contract expiry years
+df['Contract Valid Until'].value_counts()
+# The values are listed as object. Let's convert the data type
+df['Contract Valid Until']=df['Contract Valid Until'].astype(int)
+# Data looks clean for this set. Lets see which players have contracts ending in 2026
+df[['Name','Contract Valid Until','Overall','Club','Age']][df['Contract Valid Until']==2026]
+
+# Analyzing height and weight of players
+# Lets convert the data in the columns to cms and remove 'lbs'
+
+'''For Height'''
+def feet_to_cms(value): 
+    tmp = value.split("'")
+    return float((int(tmp[0]) * 12 + int(tmp[1]))*2.54) #converting feet to cms
+
+'''For weight'''
+def extract_value_from(value):
+    x = value.replace('lbs', '')
+    return float(x)
+
+df['Height'] = df['Height'].apply(lambda x: feet_to_cms(x))
+df['Weight'] = df['Weight'].apply(lambda x: extract_value_from(x))
+df=df.rename(columns={'Height': 'Height (cms)', 'Weight': 'Weight (lbs)'})
+plt.figure(figsize = (20, 12))
+ax = sns.countplot(x = 'Height (cms)', data = df, palette = 'dark')
+
+plt.figure(figsize = (20, 12))
+ax = sns.countplot(x = 'Weight (lbs)', data = df, palette = 'dark')
+
+# Analyzing columns from LS to RB, Positional attributes
+# The data has '+' between ratings and additional potential and current growth
+# Let's add them and have a single value in those field and convert the data type.
+# nans are seen only for GKs.
+df_pos=df.loc[:,'LS':'RB']
+def pos_convert(value): # converting positional attributes
+    tmp = value.split("+")
+    return (int(tmp[0]) + int(tmp[1]))
+
+df.loc[:,'LS':'RB']=df.loc[:,'LS':'RB'].astype(str)
+for i in range(df.loc[:,'LS':'RB'].shape[0]-1):
+    for j in range(df.loc[:,'LS':'RB'].shape[1]-1):
+        if df.loc[:,'LS':'RB'].iloc[i][j] not in 'nan':
+            tmp=df.loc[:,'LS':'RB'].iloc[i][j].split('+')
+            df.loc[:,'LS':'RB'].iloc[i][j]=int(tmp[0]) + int(tmp[1])
+        else: continue
+            
+    
