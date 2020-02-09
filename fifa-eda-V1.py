@@ -298,7 +298,7 @@ df[['Name','Contract Valid Until','Overall','Club','Age']][df['Contract Valid Un
 '''For Height'''
 def feet_to_cms(value): 
     tmp = value.split("'")
-    return float((int(tmp[0]) * 12 + int(tmp[1]))*2.54) #converting feet to cms
+    return float(round((int(tmp[0]) * 12 + int(tmp[1]))*2.54)) #converting feet to cms
 
 '''For weight'''
 def extract_value_from(value):
@@ -329,4 +329,21 @@ for i in pos_cols:
     df[i].loc[(pd.notna(df.LS))] = df[i].loc[(pd.notna(df.LS))].apply(lambda x: pos_convert(x))
 
 df.loc[:,'LS':'RB']=(df.loc[:,'LS':'RB'].loc[(pd.notna(df.LS))]).astype(int)
+
+#Let's create a list of top 10 nationalities
+top_countries=df.Nationality.value_counts().head(10).index.to_list()
+
 # Now all the data is clean and ready for bivariate analysis.
+sns.violinplot(y = df.Age, x = df['Preferred Foot'], palette = 'Reds') # No correlation between them
+sns.lmplot(x='Age',y='Overall',data=df)
+sns.lineplot(df['Age'], df['Overall'], palette = 'Wistia')
+sns.lineplot(df['Age'], df['Value'], palette = 'Wistia')
+sns.lineplot(df['Age'], df['Release Clause'], palette = 'Wistia')
+sns.lineplot(df['Age'], df['Potential'], palette = 'Wistia')
+sns.lineplot(df['Age'], df['Wage'], palette = 'Wistia')
+sns.lineplot(df['Age'], df['Stamina'], palette = 'Wistia')
+sns.lineplot(df['Age'], df['Penalties'], palette = 'Wistia')
+sns.lineplot(df['Age'], df['Contract Valid Until'], palette = 'Wistia')
+
+sns.violinplot(y='Weight (lbs)',x='Work Rate',hue='Preferred Foot',data=df)
+plt.figure(figsize = (20, 12))
