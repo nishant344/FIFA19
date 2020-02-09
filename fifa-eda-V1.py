@@ -81,12 +81,8 @@ df['Loaned From'].value_counts()
 
 df=df.drop(['Loaned From'],axis=1)
 
-for i in range(len(df)):
-#    a=pd.isnull(df['Joined'].iloc[i])
-    if pd.isnull(df['Joined'])[i]==True:
-        df['Joined'].iloc[i]='Jul 1, 2019'
-        df['Contract Valid Until'].iloc[i]='2022'
-    else: continue
+df.loc[(pd.isnull(df.Joined)), 'Contract Valid Until'] = '2022'
+df.Joined.fillna('Jul 1, 2019',inplace=True)
 
 # Now, for the 'Release Clause' column, lets set their value as the mean of the values of that player's rating.
 # For this, first we need to convert the data in this column to a numeric value.
@@ -105,21 +101,22 @@ def currency_converter(val):
 # We will apply this function to Value, Wage and columns
 df.Value =  df.Value.apply(lambda x: currency_converter(x))
 df.Wage =  df.Wage.apply(lambda x: currency_converter(x))
-#df['Release Clause'] =  df['Release Clause'].apply(lambda x: currency_converter(x))
 
-df['Release Clause']=df['Release Clause'].replace('[\€]', '', regex=True)
-for i in range(len(df['Release Clause'])):
-    if pd.isnull(df['Release Clause'].iloc[i])==False:
-        release_val=df['Release Clause'][i][:-1]
-        if df['Release Clause'][i][-1]=='M':
-            factor=pow(10,6)
-        elif df['Release Clause'][i][-1]=='K':
-            factor=pow(10,3)
-        else: continue
-        df['Release Clause'][i]=pd.to_numeric(release_val)*factor
-    else: continue
-    
+df['Release Clause'].loc[(pd.notna(df['Release Clause']))] =  df['Release Clause'].loc[(pd.notna(df['Release Clause']))].apply(lambda x: currency_converter(x))
 df['Release Clause']=df['Release Clause'].astype(float)
+
+#df['Release Clause']=df['Release Clause'].replace('[\€]', '', regex=True)
+#for i in range(len(df['Release Clause'])):
+#    if pd.isnull(df['Release Clause'].iloc[i])==False:
+#        release_val=df['Release Clause'][i][:-1]
+#        if df['Release Clause'][i][-1]=='M':
+#            factor=pow(10,6)
+#        elif df['Release Clause'][i][-1]=='K':
+#            factor=pow(10,3)
+#        else: continue
+#        df['Release Clause'][i]=pd.to_numeric(release_val)*factor
+#    else: continue
+
 df_RC_Overall=df[['Release Clause','Overall']]
 df_RC_Overall_null=df_RC_Overall[df['Release Clause'].isnull()]
 df_RC_Overall_notnull=df_RC_Overall.dropna(subset=['Release Clause'])
@@ -132,6 +129,8 @@ for i in range(len(df)):
         rating=df.Overall[i]
         df['Release Clause'][i]=df_means['Release Clause'][df_means.Overall==rating]
     else: continue
+
+#df_RC_Overall_null.join(df_means.set_index('Overall'),on='Overall')
 
 # Checking null values again, we see almost all the data is cleaned now
 df_null_count=df.isna().sum()
@@ -319,17 +318,15 @@ ax = sns.countplot(x = 'Weight (lbs)', data = df, palette = 'dark')
 # The data has '+' between ratings and additional potential and current growth
 # Let's add them and have a single value in those field and convert the data type.
 # nans are seen only for GKs.
-df_pos=df.loc[:,'LS':'RB']
-def pos_convert(value): # converting positional attributes
-    tmp = value.split("+")
+
+pos_cols=list(df.loc[:,'LS':'RB'].columns)
+
+def pos_convert(val): # converting positional attributes
+    tmp = val.split("+")
     return (int(tmp[0]) + int(tmp[1]))
 
-df.loc[:,'LS':'RB']=df.loc[:,'LS':'RB'].astype(str)
-for i in range(df.loc[:,'LS':'RB'].shape[0]-1):
-    for j in range(df.loc[:,'LS':'RB'].shape[1]-1):
-        if df.loc[:,'LS':'RB'].iloc[i][j] not in 'nan':
-            tmp=df.loc[:,'LS':'RB'].iloc[i][j].split('+')
-            df.loc[:,'LS':'RB'].iloc[i][j]=int(tmp[0]) + int(tmp[1])
-        else: continue
-            
-    
+for i in pos_cols:
+    df[i].loc[(pd.notna(df.LS))] = df[i].loc[(pd.notna(df.LS))].apply(lambda x: pos_convert(x))
+
+df.loc[:,'LS':'RB']=(df.loc[:,'LS':'RB'].loc[(pd.notna(df.LS))]).astype(int)
+# Now all the data is clean and ready for bivariate analysis.
