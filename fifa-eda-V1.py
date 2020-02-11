@@ -330,20 +330,6 @@ for i in pos_cols:
 
 df.loc[:,'LS':'RB']=(df.loc[:,'LS':'RB'].loc[(pd.notna(df.LS))]).astype(int)
 
-#Let's create a list of top 10 nationalities
-top_countries=df.Nationality.value_counts().head(10).index.to_list()
-
-# Now all the data is clean and ready for bivariate analysis.
-sns.violinplot(y = df.Age, x = df['Preferred Foot'], palette = 'Reds') # No correlation between them
-sns.lmplot(x='Age',y='Overall',data=df)
-sns.lineplot(df['Age'], df['Overall'], palette = 'Wistia')
-sns.lineplot(df['Age'], df['Value'], palette = 'Wistia')
-sns.lineplot(df['Age'], df['Release Clause'], palette = 'Wistia')
-sns.lineplot(df['Age'], df['Potential'], palette = 'Wistia')
-sns.lineplot(df['Age'], df['Wage'], palette = 'Wistia')
-sns.lineplot(df['Age'], df['Stamina'], palette = 'Wistia')
-sns.lineplot(df['Age'], df['Penalties'], palette = 'Wistia')
-sns.lineplot(df['Age'], df['Contract Valid Until'], palette = 'Wistia')
-
-sns.violinplot(y='Weight (lbs)',x='Work Rate',hue='Preferred Foot',data=df)
-plt.figure(figsize = (20, 12))
+# For further analysis, lets dump the clean dataframe and use it in other analysis file for cleaner computation
+from sklearn.externals import joblib
+joblib.dump(df, 'fifa19_df_clean.pkl')
