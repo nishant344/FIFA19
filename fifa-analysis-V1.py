@@ -9,7 +9,7 @@ df = joblib.load("fifa19_df_clean.pkl")
 #Let's create a list of top 10 nationalities
 top_countries=df.Nationality.value_counts().head(10).index.to_list()
 
-# Lets create functions of plots for bivariate analysis
+# Lets create functions of plots for bivariate analysis. X-axis - discrete variables, Y-axis - continuous variables
 def violinplot(disc_var,cont_var,fig_size_tup=(12,5),palette='Set3',data=df,hue=None):
     sns.set(style="whitegrid", palette="pastel", color_codes=True)
     font_size = 16
@@ -31,7 +31,14 @@ disc_var=['Preferred Foot','International Reputation','Weak Foot','Skill Moves',
 
 for x, y in [(x,y) for x in disc_var for y in cont_var]:
     violinplot(x,y,fig_size_tup=(14,7))
-    
+
+sns.pairplot(vars=['Age','Overall','Value','Special','Height (cms)','Weight (lbs)','Release Clause'],data=df)
+
+g = sns.PairGrid(df,y_vars=cont_var,x_vars=disc_var,height=4)
+g.map(sns.lineplot)
+g.add_legend();
+
+
 # Now all the data is clean and ready for bivariate analysis.
 sns.violinplot(y = df.Age, x = df['Preferred Foot'], palette = 'Reds') # No correlation between them
 sns.lmplot(x='Age',y='Overall',data=df)
