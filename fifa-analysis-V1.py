@@ -50,3 +50,59 @@ sns.lineplot(df['Age'], df['Wage'], palette = 'Wistia')
 sns.lineplot(df['Age'], df['Stamina'], palette = 'Wistia')
 sns.lineplot(df['Age'], df['Penalties'], palette = 'Wistia')
 sns.lineplot(df['Age'], df['Contract Valid Until'], palette = 'Wistia')
+
+# plotting a pie chart to represent share of international repuatation
+labels = ['1', '2', '3', '4', '5']
+sizes = df['International Reputation'].value_counts()
+colors = plt.cm.copper(np.linspace(0, 1, 5))
+explode = [0.1, 0.1, 0.2, 0.3, 0.4]
+
+plt.rcParams['figure.figsize'] = (12, 12)
+plt.pie(sizes, labels = labels, colors = colors, explode = explode, shadow = True)
+plt.title('International Repuatation for the Football Players', fontsize = 20)
+plt.legend()
+plt.show()
+
+# plotting a pie chart to represent the share of week foot players
+labels = ['5', '4', '3', '2', '1'] 
+size = df['Weak Foot'].value_counts()
+colors = plt.cm.Wistia(np.linspace(0, 1, 5))
+explode = [0, 0, 0, 0, 0.1]
+plt.pie(size, labels = labels, colors = colors, explode = explode, shadow = True, startangle = 90)
+plt.title('Distribution of Week Foot among Players', fontsize = 25)
+plt.legend()
+plt.show()
+
+# Adding new parameters/features based on combination of existing skill sets.
+def defending(df):
+    return int(round((df[['Marking', 'StandingTackle', 'SlidingTackle']].mean()).mean()))
+
+def general(df):
+    return int(round((df[['HeadingAccuracy', 'Dribbling', 'Curve', 'BallControl', 'Stamina']].mean()).mean()))
+
+def mental(df):
+    return int(round((df[['Aggression', 'Interceptions', 'Positioning', 'Vision','Composure']].mean()).mean()))
+
+def passing(df):
+    return int(round((df[['Crossing', 'ShortPassing', 'LongPassing']].mean()).mean()))
+
+def mobility(df):
+    return int(round((df[['Acceleration', 'SprintSpeed', 'Agility','Reactions']].mean()).mean()))
+
+def power(df):
+    return int(round((df[['Balance', 'Jumping', 'Stamina', 'Strength']].mean()).mean()))
+
+def rating(df):
+    return int(round((df[['Potential', 'Overall']].mean()).mean()))
+
+def shooting(df):
+    return int(round((df[['Finishing', 'Volleys', 'FKAccuracy', 'ShotPower','LongShots', 'Penalties']].mean()).mean()))
+
+df['Defending'] = df.apply(defending, axis = 1)
+df['General'] = df.apply(general, axis = 1)
+df['Mental'] = df.apply(mental, axis = 1)
+df['Passing'] = df.apply(passing, axis = 1)
+df['Mobility'] = df.apply(mobility, axis = 1)
+df['Power'] = df.apply(power, axis = 1)
+df['Rating'] = df.apply(rating, axis = 1)
+df['Shooting'] = df.apply(shooting, axis = 1)
