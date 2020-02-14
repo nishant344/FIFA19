@@ -106,3 +106,46 @@ df['Mobility'] = df.apply(mobility, axis = 1)
 df['Power'] = df.apply(power, axis = 1)
 df['Rating'] = df.apply(rating, axis = 1)
 df['Shooting'] = df.apply(shooting, axis = 1)
+
+# best players per each position with their age, club, and nationality based on their overall scores
+df.iloc[df.groupby(df['Position'])['Overall'].idxmax()][['Position', 'Name', 'Age', 'Club', 'Nationality']]
+
+# Every Nations' Player and their Weights
+df_countries = df.loc[df['Nationality'].isin(top_countries) & df['Weight (lbs)']]
+
+plt.rcParams['figure.figsize'] = (15, 7)
+ax = sns.violinplot(x = df_countries['Nationality'], y = df_countries['Weight (lbs)'], palette = 'Reds')
+ax.set_xlabel(xlabel = 'Countries', fontsize = 9)
+ax.set_ylabel(ylabel = 'Weight in lbs', fontsize = 9)
+ax.set_title(label = 'Distribution of Weight of players from different countries', fontsize = 20)
+plt.show()
+
+# Every Nations' Player and their overall scores
+df_countries = df.loc[df['Nationality'].isin(top_countries) & df['Overall']]
+
+plt.rcParams['figure.figsize'] = (15, 7)
+ax = sns.barplot(x = df_countries['Nationality'], y = df_countries['Overall'], palette = 'spring')
+ax.set_xlabel(xlabel = 'Countries', fontsize = 9)
+ax.set_ylabel(ylabel = 'Overall Scores', fontsize = 9)
+ax.set_title(label = 'Distribution of overall scores of players from different countries', fontsize = 20)
+plt.show()
+
+# Every Nations' Player and their wages
+df_countries = df.loc[df['Nationality'].isin(top_countries) & df['Wage']]
+
+plt.rcParams['figure.figsize'] = (15, 7)
+ax = sns.barplot(x = df_countries['Nationality'], y = df_countries['Wage'], palette = 'Purples')
+ax.set_xlabel(xlabel = 'Countries', fontsize = 9)
+ax.set_ylabel(ylabel = 'Wage', fontsize = 9)
+ax.set_title(label = 'Distribution of Wages of players from different countries', fontsize = 15)
+plt.show()
+
+# Every Nations' Player and their International Reputation
+df_countries = df.loc[df['Nationality'].isin(top_countries) & df['International Reputation']]
+
+plt.rcParams['figure.figsize'] = (15, 7)
+ax = sns.boxenplot(x = df_countries['Nationality'], y = df_countries['International Reputation'], palette = 'autumn')
+ax.set_xlabel(xlabel = 'Countries', fontsize = 9)
+ax.set_ylabel(ylabel = 'Distribution of reputation', fontsize = 9)
+ax.set_title(label = 'Distribution of International Repuatation of players from different countries', fontsize = 15)
+plt.show()
