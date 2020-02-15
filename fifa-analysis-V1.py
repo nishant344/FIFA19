@@ -149,3 +149,40 @@ ax.set_xlabel(xlabel = 'Countries', fontsize = 9)
 ax.set_ylabel(ylabel = 'Distribution of reputation', fontsize = 9)
 ax.set_title(label = 'Distribution of International Repuatation of players from different countries', fontsize = 15)
 plt.show()
+
+# Analysing finishing and shot power
+df[['Age','Overall','Potential' ,'Finishing','Stamina']].hist(figsize=(15,10),bins=20,color='g',linewidth='1.5',edgecolor='k')
+plt.tight_layout()
+plt.show()
+
+# How are Overall and Potential scores related?
+p = sns.lineplot(x = 'Age', y = 'Overall', ci = None, data = df, label = 'Overall')
+p = sns.lineplot(x = 'Age', y = 'Potential', ci = None, data = df, label = 'Potential')
+p = plt.ylabel('Potential vs Overall')
+p = plt.legend(loc = 1)
+
+# Analysing Manchester United Players
+df_manu=df.loc[df.Club=="Manchester United"].sort_values(by=['Value','Contract Valid Until'],ascending=False)
+df_manu=df_manu[['Name','Rating','Nationality','Age','Position','Value','Contract Valid Until','Release Clause','Work Rate','Defending','Mental','General','Passing','Mobility','Power','Shooting']]
+
+# Analysing which contracts to renew
+df_manu_contractsdue=df_manu.loc[df_manu['Contract Valid Until']<2021].sort_values(by=['Contract Valid Until','Value'])
+
+low_workrate=['Medium/ Low','High/ Low','Low/ Medium','Low/ High','Low/ Low']
+df_manu_contractsdue['Work Rate'].value_counts()
+df_manu_low_workrate=df_manu_contractsdue.loc[df_manu_contractsdue['Work Rate']=='Low/ High']
+# Darmian has low attack work rate but being a defender (LB), lets analyse further and compare him with LB's available
+(df.Value[df.Name=='M. Darmian'])
+(df.Wage[df.Name=='M. Darmian'])
+(df.Rating[df.Name=='M. Darmian'])
+(df['Release Clause'][df.Name=='M. Darmian'])
+df[['Name','Rating','Contract Valid Until','Value','Defending','Age','Release Clause']].loc[df.Value<6000000.0].loc[df.Rating>76].loc[df.Position=='LB']
+# There are only 4 players that have such requirements. Most of them are old and one has contract ending in 20222.
+# We need to change requirements.
+# Lets find LB players in ManU
+df_manu.loc[df_manu.Position=='LB']
+# We can replace darmina with LWB as well
+df_manu.loc[df_manu.Position=='LWB'] # No such player. Lets try in market
+df_Darmian_replace=df[['Name','Club','Rating','Contract Valid Until','Value','Defending','Age']].loc[df.Value<6000000.0].loc[df.Rating>76].loc[df.Position=='LWB']
+# No such player. Lets try increasing the value
+df_Darmian_replace=df[['Name','Club','Wage','Rating','Contract Valid Until','Value','Defending','Age','Release Clause']].loc[df.Value<10000000.0].loc[df.Rating>78].loc[df.Position=='LB']
