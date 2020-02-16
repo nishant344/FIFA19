@@ -175,6 +175,7 @@ df_manu_low_workrate=df_manu_contractsdue.loc[df_manu_contractsdue['Work Rate']=
 (df.Value[df.Name=='M. Darmian'])
 (df.Wage[df.Name=='M. Darmian'])
 (df.Rating[df.Name=='M. Darmian'])
+(df.Defending[df.Name=='M. Darmian'])
 (df['Release Clause'][df.Name=='M. Darmian'])
 df[['Name','Rating','Contract Valid Until','Value','Defending','Age','Release Clause']].loc[df.Value<6000000.0].loc[df.Rating>76].loc[df.Position=='LB']
 # There are only 4 players that have such requirements. Most of them are old and one has contract ending in 20222.
@@ -185,4 +186,19 @@ df_manu.loc[df_manu.Position=='LB']
 df_manu.loc[df_manu.Position=='LWB'] # No such player. Lets try in market
 df_Darmian_replace=df[['Name','Club','Rating','Contract Valid Until','Value','Defending','Age']].loc[df.Value<6000000.0].loc[df.Rating>76].loc[df.Position=='LWB']
 # No such player. Lets try increasing the value
-df_Darmian_replace=df[['Name','Club','Wage','Rating','Contract Valid Until','Value','Defending','Age','Release Clause']].loc[df.Value<10000000.0].loc[df.Rating>78].loc[df.Position=='LB']
+df_Darmian_replace=df[['Name','Club','Wage','Rating','Contract Valid Until','Value','Defending','Age','Release Clause','Position']].loc[(df.Age<27) & (df.Rating>78) & (df.Position).isin(['LB','LWB']) & (df['Contract Valid Until']<2021) & (df.Defending>75)]
+df_Darmian_replace=df_Darmian_replace.sort_values(by=['Rating','Value','Wage'],ascending=False)
+(df['Work Rate'][df.Name=='N. Schulz'])
+# Lets try scouting N. Schulz and later turn him into a star. He has gpt the age as well.
+
+# Now lets try identifying other players who need contract renewal.
+df_manu_def=df_manu.loc[(df_manu.Position.str.contains('B'))]
+# Phil Jones has lowest mobility among all defenders, lets try getting a better replacement
+(df.Value[df.Name=='P. Jones'])
+(df.Wage[df.Name=='P. Jones'])
+(df.Rating[df.Name=='P. Jones'])
+(df.Defending[df.Name=='P. Jones'])
+(df['Release Clause'][df.Name=='P. Jones'])
+df_Jones_replace=df[['Name','Club','Wage','Rating','Contract Valid Until','Value','Defending','Age','Release Clause','Position']].loc[(df.Age<30) & (df.Mobility>70) & (df.Rating>79) & (df.Position).isin(['CB','RCB','LCB']) & (df['Contract Valid Until']<2022) & (df.Defending>79)]
+# Lets try scouting O. Toprak this year if we get good sponsorship money or next calendar year
+df[['Work Rate','Mobility']][df.Name=='O. Toprak']
